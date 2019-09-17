@@ -1,0 +1,11 @@
+{
+	"name": "XSLT",
+	"id": 20000,
+	"commands": [
+		{
+			"theme": "XSLT",
+			"syntax": "XSLT Apply stylesheet(&O;&O;&J):O",
+			"threadSafe": true
+		}
+	]
+}
