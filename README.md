@@ -16,3 +16,27 @@ XSLT based on libxml
 ### Syntax
 
 [miyako.github.io](https://miyako.github.io/2019/09/17/4d-plugin-xslt.html)
+
+### Examples
+
+```
+$params:=New object
+$params.str1:="'test'"
+
+  //reserved: xmlParserOption,xslParserOption
+
+$xslPath:=Get 4D folder(Current resources folder)+"sample.xsl"
+$xmlPath:=Get 4D folder(Current resources folder)+"apple.svg"
+
+DOCUMENT TO BLOB($xmlPath;$xmlData)
+DOCUMENT TO BLOB($xslPath;$xslData)
+
+CONVERT FROM TEXT($xmlPath;"utf-8";$xmlFile)
+CONVERT FROM TEXT($xslPath;"utf-8";$xslFile)
+
+$xsltData:=XSLT Apply stylesheet ($xmlFile;$xslFile;$params)
+$xslt:=Convert to text($xsltData;"utf-8")
+
+$xsltData:=XSLT Apply stylesheet ($xmlData;$xslData;$params)
+$xslt:=Convert to text($xsltData;"utf-8")
+```
