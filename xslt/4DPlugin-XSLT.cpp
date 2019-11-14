@@ -70,81 +70,69 @@ void PluginMain(PA_long32 selector, PA_PluginParameters params) {
 
 #pragma mark -
 
-BOOL is_file_path(PA_Handle h) {
+BOOL is_file_path(C_BLOB& h) {
     
     BOOL result = FALSE;
-    
-    if(h) {
-        
-        PA_long32 size = PA_GetHandleSize(h);
-        
-        if(size < 1024) {
             
-            C_TEXT t;
-            t.setUTF8String((const uint8_t *)PA_LockHandle(h), size);
-            PA_UnlockHandle(h);
-            
-            PA_Variable    params[1];
-            params[0] = PA_CreateVariable(eVK_Unistring);
-            PA_Unistring path = PA_CreateUnistring((PA_Unichar *)t.getUTF16StringPtr());
-            PA_SetStringVariable(&params[0], &path);
-            result = (1 == PA_GetLongintVariable(PA_ExecuteCommandByID(476 /* test path name */, params, 1)));
-            PA_ClearVariable(&params[0]);
+    PA_long32 size = h.getBytesLength();
     
-        }
+    if(size < 1024) {
         
+        C_TEXT t;
+        t.setUTF8String((const uint8_t *)h.getBytesPtr(), size);
+        
+        PA_Variable    params[1];
+        params[0] = PA_CreateVariable(eVK_Unistring);
+        PA_Unistring path = PA_CreateUnistring((PA_Unichar *)t.getUTF16StringPtr());
+        PA_SetStringVariable(&params[0], &path);
+        result = (1 == PA_GetLongintVariable(PA_ExecuteCommandByID(476 /* test path name */, params, 1)));
+        PA_ClearVariable(&params[0]);
+
     }
 
     return result;
 }
 
-xmlDocPtr parse_xml_doc(PA_Handle h, int options) {
+xmlDocPtr parse_xml_doc(C_BLOB& h, int options) {
     
     xmlDocPtr xmlDoc = 0;
     
-    if(h) {
-        
-        if(is_file_path(h))
-        {
-            /* convert path hfs to posix */
+    if(is_file_path(h))
+    {
+        /* convert path hfs to posix */
 #if VERSIONMAC
-            NSString *str = [[NSString alloc]initWithUTF8String:(const char *)PA_LockHandle(h)];
-            PA_UnlockHandle(h);
-            if(str) {
-                
-                NSURL *url = (NSURL *)CFURLCreateWithFileSystemPath(kCFAllocatorDefault,
-                                                                    (CFStringRef)str, kCFURLHFSPathStyle, false);
-                if(url) {
-                    NSString *path = (NSString *)CFURLCopyFileSystemPath((CFURLRef)url, kCFURLPOSIXPathStyle);
-                    if(path) {
-                        xmlDoc = xmlParseFile((const char *)[path UTF8String]);
-                        [path release];
-                    }
-                    [url release];
+        NSString *str = [[NSString alloc]initWithUTF8String:(const char *)h.getBytesPtr()];
+        if(str) {
+            
+            NSURL *url = (NSURL *)CFURLCreateWithFileSystemPath(kCFAllocatorDefault,
+                                                                (CFStringRef)str, kCFURLHFSPathStyle, false);
+            if(url) {
+                NSString *path = (NSString *)CFURLCopyFileSystemPath((CFURLRef)url, kCFURLPOSIXPathStyle);
+                if(path) {
+                    xmlDoc = xmlParseFile((const char *)[path UTF8String]);
+                    [path release];
                 }
-                [str release];
+                [url release];
             }
+            [str release];
+        }
 #else
-            xmlDoc = xmlParseFile((const char *)PA_LockHandle(h));
-            PA_UnlockHandle(h);
+        xmlDoc = xmlParseFile((const char *)h.getBytesPtr());
 #endif
 
-        }else
-        {
-            xmlDoc = xmlParseMemory(PA_LockHandle(h), PA_GetHandleSize(h));
-            PA_UnlockHandle(h);
-        }
-        
-        if(xmlDoc) {
-            xmlXIncludeProcessFlags(xmlDoc, options);
-        }
-        
+    }else
+    {
+        xmlDoc = xmlParseMemory((const char *)h.getBytesPtr(), h.getBytesLength());
     }
     
+    if(xmlDoc) {
+        xmlXIncludeProcessFlags(xmlDoc, options);
+    }
+     
     return xmlDoc;
 }
 
-xsltStylesheetPtr parse_xsl_doc(PA_Handle h, int options) {
+xsltStylesheetPtr parse_xsl_doc(C_BLOB& h, int options) {
     
     xsltStylesheetPtr xslDoc = 0;
     
@@ -163,9 +151,15 @@ xsltStylesheetPtr parse_xsl_doc(PA_Handle h, int options) {
 void XSLT_Apply_stylesheet(PA_PluginParameters params) {
 
     C_BLOB returnValue;
+        
+//    sLONG_PTR *pResult = (sLONG_PTR *)params->fResult;
+    PackagePtr pParams = (PackagePtr)params->fParameters;
     
-    PA_Handle xml = PA_GetBlobHandleParameter(params, 1);
-    PA_Handle xsl = PA_GetBlobHandleParameter(params, 2);
+    C_BLOB xml;
+    xml.fromParamAtIndex(pParams, 1);
+    
+    C_BLOB xsl;
+    xsl.fromParamAtIndex(params, 2);
     
     std::vector<const char *> xslParams;
     std::vector<std::string> xslParamsValues;
