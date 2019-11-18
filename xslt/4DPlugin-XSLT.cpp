@@ -46,11 +46,20 @@ void PluginMain(PA_long32 selector, PA_PluginParameters params) {
         {
             case kInitPlugin :
             case kServerInitPlugin :
-                PA_RunInMainProcess((PA_RunInMainProcessProcPtr)OnStartup, NULL);
+#ifdef _WIN64
+				PA_RunInMainProcess((PA_RunInMainProcessProcPtr)OnStartup, NULL);
+#else
+				OnStartup();
+#endif // _WIN64
                 break;
                 
             case kDeinitPlugin :
-                PA_RunInMainProcess((PA_RunInMainProcessProcPtr)OnExit, NULL);
+#ifdef _WIN64
+				PA_RunInMainProcess((PA_RunInMainProcessProcPtr)OnExit, NULL);
+#else
+				OnExit();
+#endif // _WIN64
+                
                 break;
                 
 			// --- XSLT
