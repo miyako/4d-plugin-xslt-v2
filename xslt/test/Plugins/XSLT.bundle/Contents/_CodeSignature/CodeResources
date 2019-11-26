@@ -8,7 +8,7 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			FsKF96SOTspACInULh0JRZ/ZO8g=
+			H/2n2LU8309ZgbtFLxKbjlD/ow8=
 			</data>
 			<key>optional</key>
 			<true/>
@@ -22,6 +22,10 @@
 	<dict>
 		<key>QuickLook/Thumbnail.png</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			hC+U8EqvyIRM1lLakHLfvl4V9Tc=
+			</data>
 			<key>hash2</key>
 			<data>
 			nGfrvibB5KlzvZgF4Bra+l0HpRloxismgTLePnOwCdk=
@@ -29,15 +33,23 @@
 		</dict>
 		<key>Resources/English.lproj/InfoPlist.strings</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			H/2n2LU8309ZgbtFLxKbjlD/ow8=
+			</data>
 			<key>hash2</key>
 			<data>
-			787PDKY1vzSGDHVtB0FdE3dK86pecp0Je3FMbCJ7HNw=
+			BlRivDlU7B4FIBU1ziiO4YbNDIzZKCkTRhHLDJ1DNZg=
 			</data>
 			<key>optional</key>
 			<true/>
 		</dict>
 		<key>Resources/constants.xlf</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			rkdXHmHw/Xt/bVpZqFFA/Y1RZWs=
+			</data>
 			<key>hash2</key>
 			<data>
 			k1HY+1QMk/HLLIWBiqf4put+vvIVeHqFVPVCUEx6LIw=
@@ -45,16 +57,46 @@
 		</dict>
 		<key>Windows/XSLT.4DX</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			NVoqdox58ZzD4pmihNiTx6wuNxE=
+			</data>
 			<key>hash2</key>
 			<data>
 			MTN+L5rF8Vyg2LsShlIGZLivARYPbuLQfvkEfm+TxUE=
 			</data>
 		</dict>
+		<key>Windows/vcruntime140.dll</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			qDpOxwF20NwKx03mv6KIkMGPHSU=
+			</data>
+			<key>hash2</key>
+			<data>
+			LbJKllnn90/lxa10K72DUMj1vkYPmt8cn6EeDztFcb4=
+			</data>
+		</dict>
 		<key>Windows64/XSLT.4DX</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			yNIdcWH69wixEyjnhxl92naBvek=
+			</data>
 			<key>hash2</key>
 			<data>
 			fKzywLaRNd/Rn02Ea2VJSeR5HeRUCCs5mC6o4XRGLb8=
+			</data>
+		</dict>
+		<key>Windows64/vcruntime140.dll</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			RPwfL/P6ciT52XBdcgtg819m1E8=
+			</data>
+			<key>hash2</key>
+			<data>
+			OTedDDGKoZ+/s6xN6UqEYAIYzvrjPCu0QSf5lLOQv5A=
 			</data>
 		</dict>
 		<key>manifest.json</key>
