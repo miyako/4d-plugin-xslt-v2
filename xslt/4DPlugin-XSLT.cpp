@@ -109,8 +109,12 @@ xmlDocPtr parse_xml_doc(C_BLOB& h, int options) {
     if(is_file_path(h))
     {
         /* convert path hfs to posix */
+        
+        //the blob is not null-terminated!
+        std::string buf = std::string((const char *)h.getBytesPtr(), h.getBytesLength());
+        
 #if VERSIONMAC
-        NSString *str = [[NSString alloc]initWithUTF8String:(const char *)h.getBytesPtr()];
+        NSString *str = [[NSString alloc]initWithUTF8String:buf.c_str()];
         if(str) {
             
             NSURL *url = (NSURL *)CFURLCreateWithFileSystemPath(kCFAllocatorDefault,
@@ -126,7 +130,7 @@ xmlDocPtr parse_xml_doc(C_BLOB& h, int options) {
             [str release];
         }
 #else
-        xmlDoc = xmlParseFile((const char *)h.getBytesPtr());
+        xmlDoc = xmlParseFile((const char *)buf.c_str());
 #endif
 
     }else
@@ -160,7 +164,9 @@ xsltStylesheetPtr parse_xsl_doc(C_BLOB& h, int options) {
 void XSLT_Apply_stylesheet(PA_PluginParameters params) {
 
     C_BLOB returnValue;
-        
+       
+    bool didReturn = false;
+    
 //    sLONG_PTR *pResult = (sLONG_PTR *)params->fResult;
     PackagePtr pParams = (PackagePtr)params->fParameters;
     
@@ -242,11 +248,12 @@ void XSLT_Apply_stylesheet(PA_PluginParameters params) {
                 if(outputBuffer) {
                     // mysteriously, 0 is returned
                     // http://xmlsoft.org/XSLT/html/libxslt-xsltutils.html#xsltSaveResultTo
-                    xsltSaveResultTo (outputBuffer, outDoc, xslDoc);
+                    int bytesWritten = xsltSaveResultTo (outputBuffer, outDoc, xslDoc);
                     size_t resultLength = xmlOutputBufferGetSize(outputBuffer);
                     if (resultLength)
                     {
                         PA_ReturnBlob(params, (void *)xmlOutputBufferGetContent(outputBuffer), (PA_long32)resultLength);
+                        didReturn = true;
                     }
                     xmlOutputBufferClose(outputBuffer);
                 }
@@ -257,5 +264,8 @@ void XSLT_Apply_stylesheet(PA_PluginParameters params) {
         if(xmlDoc) xmlFreeDoc(xmlDoc);
     }
     
+    if(!didReturn){
+        PA_ReturnBlob(params, (void *)"", (PA_long32)0L);
+    }
 }
 

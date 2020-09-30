@@ -1,23 +1,6 @@
 ﻿{
 	"methods": {
-		"generate_constants_xlf": {
-			"timeStamp": "2019-11-13T07:45:41.000Z",
-			"attributes": {
-				"invisible": true,
-				"preemptive": "capable"
-			}
-		},
-		"generate_file_from_template": {
-			"timeStamp": "2019-11-13T07:45:41.000Z",
-			"attributes": {
-				"invisible": true,
-				"preemptive": "capable"
-			}
-		},
-		"generate_project": {
-			"timeStamp": "2019-11-13T07:45:41.000Z"
-		},
-		"generate_project_infoplist": {
+		"generate_project_source": {
 			"timeStamp": "2019-11-13T07:45:41.000Z",
 			"attributes": {
 				"invisible": true,
@@ -31,19 +14,18 @@
 				"preemptive": "capable"
 			}
 		},
-		"generate_project_source": {
-			"timeStamp": "2019-11-13T07:45:41.000Z",
-			"attributes": {
-				"invisible": true,
-				"preemptive": "capable"
-			}
-		},
 		"generate_project_vs": {
 			"timeStamp": "2019-11-13T07:45:41.000Z",
 			"attributes": {
 				"invisible": true,
 				"preemptive": "capable"
 			}
+		},
+		"generate_project": {
+			"timeStamp": "2019-11-13T07:45:41.000Z"
+		},
+		"TEST": {
+			"timeStamp": "2020-09-30T00:50:05.517Z"
 		},
 		"generate_project_xcode": {
 			"timeStamp": "2019-11-13T07:45:41.000Z",
@@ -52,8 +34,26 @@
 				"preemptive": "capable"
 			}
 		},
-		"TEST": {
-			"timeStamp": "2019-11-13T07:45:41.000Z"
+		"generate_project_infoplist": {
+			"timeStamp": "2019-11-13T07:45:41.000Z",
+			"attributes": {
+				"invisible": true,
+				"preemptive": "capable"
+			}
+		},
+		"generate_constants_xlf": {
+			"timeStamp": "2019-11-13T07:45:41.000Z",
+			"attributes": {
+				"invisible": true,
+				"preemptive": "capable"
+			}
+		},
+		"generate_file_from_template": {
+			"timeStamp": "2019-11-13T07:45:41.000Z",
+			"attributes": {
+				"invisible": true,
+				"preemptive": "capable"
+			}
 		}
 	}
 }
