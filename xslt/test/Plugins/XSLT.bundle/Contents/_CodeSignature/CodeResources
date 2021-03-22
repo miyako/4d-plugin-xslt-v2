@@ -8,7 +8,7 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			0uyL9rb/no6QIcBg4jxexYoCbmk=
+			fU/xWuF1KFdAnk4Sqf4DQpZk2F4=
 			</data>
 			<key>optional</key>
 			<true/>
@@ -39,11 +39,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			0uyL9rb/no6QIcBg4jxexYoCbmk=
+			fU/xWuF1KFdAnk4Sqf4DQpZk2F4=
 			</data>
 			<key>hash2</key>
 			<data>
-			q0DphL/B9buW4LV5BJUPwwFpWfOfGBeZsACWYwYI7jY=
+			20hQprIyRiIeYx0/Ct2S1fu4IhZgt0VUvx7Sf/ty2j4=
 			</data>
 			<key>optional</key>
 			<true/>
@@ -68,28 +68,6 @@
 			<key>hash2</key>
 			<data>
 			fokI3GXFQbbH7WfPJHe0uHeGjwDiAIX7hg6BzNTFG04=
-			</data>
-		</dict>
-		<key>Windows/XSLT.4DX</key>
-		<dict>
-			<key>hash</key>
-			<data>
-			c9rPWJD6gCSyN3Zz/L7yiXWdkTg=
-			</data>
-			<key>hash2</key>
-			<data>
-			ZHWj48gmvml7kLTPU0/VQDxQ830San50fEgBpm3zb0Q=
-			</data>
-		</dict>
-		<key>Windows/vcruntime140.dll</key>
-		<dict>
-			<key>hash</key>
-			<data>
-			qDpOxwF20NwKx03mv6KIkMGPHSU=
-			</data>
-			<key>hash2</key>
-			<data>
-			LbJKllnn90/lxa10K72DUMj1vkYPmt8cn6EeDztFcb4=
 			</data>
 		</dict>
 		<key>Windows64/XSLT.4DX</key>
