@@ -14,6 +14,39 @@ XSLT based on [libxml](http://xmlsoft.org/libxslt/).
 
 [miyako.github.io](https://miyako.github.io/2019/09/17/4d-plugin-xslt.html)
 
+### Note
+
+to compile typical UNIX/GNU tool for Apple Silicon
+
+run 
+
+```
+autoreconf -if
+```
+
+set
+
+```
+export CC="gcc"
+export CXX="g++"
+export CCFLAGS="-arch arm64"
+export CXXFLAGS="-arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"
+export CFLAGS="-arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"
+export LDFLAGS="-arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"
+export CPPFLAGS=""
+```
+
+also useful to set `-L` for `LDFLAGS` and `-I` for `CPPFLAGS`
+
+then 
+
+```
+./configure --host=aarch64-apple-darwin19.6.0
+```
+
+in case of an Intel Mac
+
+
 ### Examples
 
 ```
