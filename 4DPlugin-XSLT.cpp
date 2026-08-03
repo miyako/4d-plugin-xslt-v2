@@ -10,6 +10,9 @@
 
 #include "4DPlugin-XSLT.h"
 
+#include <cmath>
+#include <limits>
+
 #pragma mark -
 
 void OnStartup()
@@ -114,20 +117,22 @@ xmlDocPtr parse_xml_doc(C_BLOB& h, int options) {
         std::string buf = std::string((const char *)h.getBytesPtr(), h.getBytesLength());
         
 #if VERSIONMAC
-        NSString *str = [[NSString alloc]initWithUTF8String:buf.c_str()];
-        if(str) {
-            
-            NSURL *url = (NSURL *)CFURLCreateWithFileSystemPath(kCFAllocatorDefault,
-                                                                (CFStringRef)str, kCFURLHFSPathStyle, false);
-            if(url) {
-                NSString *path = (NSString *)CFURLCopyFileSystemPath((CFURLRef)url, kCFURLPOSIXPathStyle);
-                if(path) {
-                    xmlDoc = xmlParseFile((const char *)[path UTF8String]);
-                    [path release];
+        @autoreleasepool {
+            NSString *str = [[NSString alloc]initWithUTF8String:buf.c_str()];
+            if(str) {
+                
+                NSURL *url = (NSURL *)CFURLCreateWithFileSystemPath(kCFAllocatorDefault,
+                                                                    (CFStringRef)str, kCFURLHFSPathStyle, false);
+                if(url) {
+                    NSString *path = (NSString *)CFURLCopyFileSystemPath((CFURLRef)url, kCFURLPOSIXPathStyle);
+                    if(path) {
+                        xmlDoc = xmlParseFile((const char *)[path UTF8String]);
+                        [path release];
+                    }
+                    [url release];
                 }
-                [url release];
+                [str release];
             }
-            [str release];
         }
 #else
         xmlDoc = xmlParseFile((const char *)buf.c_str());
@@ -223,12 +228,24 @@ void XSLT_Apply_stylesheet(PA_PluginParameters params) {
     
     if(ob_is_defined(options, L"xmlParserOption"))
     {
-        xmlParserOption |= (int)ob_get_n(options, L"xmlParserOption");
+        double v = ob_get_n(options, L"xmlParserOption");
+        if(std::isfinite(v) &&
+           v >= (double)std::numeric_limits<int>::min() &&
+           v <= (double)std::numeric_limits<int>::max())
+        {
+            xmlParserOption |= (int)v;
+        }
     }
     
     if(ob_is_defined(options, L"xslParserOption"))
     {
-        xslParserOption |= (int)ob_get_n(options, L"xslParserOption");
+        double v = ob_get_n(options, L"xslParserOption");
+        if(std::isfinite(v) &&
+           v >= (double)std::numeric_limits<int>::min() &&
+           v <= (double)std::numeric_limits<int>::max())
+        {
+            xslParserOption |= (int)v;
+        }
     }
 
     xmlDocPtr xmlDoc = parse_xml_doc(xml, xmlParserOption);
@@ -259,6 +276,7 @@ void XSLT_Apply_stylesheet(PA_PluginParameters params) {
                 }
                 xmlFreeDoc(outDoc);
             }
+            if(ctxt) xsltFreeTransformContext(ctxt);
             xsltFreeStylesheet(xslDoc);
         }
         if(xmlDoc) xmlFreeDoc(xmlDoc);
