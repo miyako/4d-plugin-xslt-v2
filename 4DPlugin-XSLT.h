@@ -11,6 +11,23 @@
 #ifndef PLUGIN_XSLT_H
 #define PLUGIN_XSLT_H
 
+/*
+ libxslt/xsltlocale.h does a bare #include <windows.h> on _WIN32 (for
+ XSLT_LOCALE_WINAPI), before this TU ever reaches C_BLOB.h -> C_TYPES.h,
+ which is where WIN32_LEAN_AND_MEAN normally gets set. Because <windows.h>
+ has its own include guard, setting the macro later is a no-op once that
+ first bare include has already pulled in the legacy <winsock.h> -- which
+ then collides with <winsock2.h> in 4DPlugin-JSON.h (duplicate sockaddr/
+ fd_set/accept/bind/... -- MSVC C2011/C2375). Setting it here, before any
+ include in this file, guarantees it's in effect for whichever header is
+ actually first to touch <windows.h>.
+ */
+#ifdef _WIN32
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#endif
+
 #include "4DPluginAPI.h"
 
 #include <libxml/xmlmemory.h>
