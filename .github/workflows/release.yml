@@ -8,6 +8,12 @@
 # Canonical layout enforced:
 #   test/Plugins/<Product>.bundle/Contents/MacOS/<Product>
 #   test/Plugins/<Product>.bundle/Contents/Windows64/<Product>.4DX
+#
+# Windows runtime: the prebuilt libxslt/libexslt static libs are /MD, so the
+# .4DX imports VCRUNTIME140(_1).dll. Any DLLs committed in Contents/Windows64
+# are preserved, the app-local VC++ runtime the .4DX imports is copied from
+# the VS redist folder, and .github/scripts/verify-windows-deps.ps1 fails the
+# build if any non-system DLL the .4DX needs (recursively) is missing.
 
 name: Build & Release
 
@@ -62,6 +68,17 @@ jobs:
       - name: setup MSBuild
         uses: microsoft/setup-msbuild@v2
 
+      - name: stash committed runtime DLLs
+        shell: pwsh
+        run: |
+          # The clean step below wipes the bundle; keep any DLLs committed next to the .4DX.
+          $product = "${{ env.PRODUCT_NAME }}"
+          $base = "${{ env.BASE_DIR }}"
+          $src = "$base/Plugins/$product.bundle/Contents/Windows64"
+          New-Item -ItemType Directory -Force -Path windlls | Out-Null
+          if (Test-Path $src) { Copy-Item "$src/*.dll" windlls/ -ErrorAction SilentlyContinue }
+          Get-ChildItem windlls | Format-Table Name, Length
+
       - name: clean stale outputs
         shell: pwsh
         run: |
@@ -108,11 +125,50 @@ jobs:
           }
           Get-ChildItem $canonicalDir
 
+      - name: collect windows binaries
+        shell: pwsh
+        run: |
+          $product = "${{ env.PRODUCT_NAME }}"
+          $base = "${{ env.BASE_DIR }}"
+          $canonicalDir = "$base/Plugins/$product.bundle/Contents/Windows64"
+          New-Item -ItemType Directory -Force -Path winbin | Out-Null
+          Copy-Item "$canonicalDir/$product.4DX" winbin/
+          Copy-Item windlls/*.dll winbin/ -ErrorAction SilentlyContinue
+
+          # App-local VC++ runtime (redistributable per Microsoft's license),
+          # taken from the same toolset that linked the .4DX. Overwrites any
+          # older committed copy so all runtime DLLs come from one version.
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $vs = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          $dumpbin = Get-ChildItem "$vs\VC\Tools\MSVC\*\bin\Hostx64\x64\dumpbin.exe" | Sort-Object FullName -Descending | Select-Object -First 1 -ExpandProperty FullName
+          if (-not $dumpbin) { Write-Error 'dumpbin.exe not found'; exit 1 }
+          $redistVer = Get-Content "$vs\VC\Auxiliary\Build\Microsoft.VCRedistVersion.default.txt" -ErrorAction SilentlyContinue | Select-Object -First 1
+          $crt = $null
+          if ($redistVer) { $crt = Get-ChildItem "$vs\VC\Redist\MSVC\$($redistVer.Trim())\x64\Microsoft.VC14*.CRT" -Directory -ErrorAction SilentlyContinue | Select-Object -First 1 }
+          if (-not $crt) {
+            $crt = Get-ChildItem "$vs\VC\Redist\MSVC\*\x64\Microsoft.VC14*.CRT" -Directory |
+              Sort-Object FullName -Descending | Select-Object -First 1
+          }
+          if (-not $crt) { Write-Error 'VC++ redist CRT folder not found'; exit 1 }
+          Write-Host "VC++ CRT: $($crt.FullName)"
+
+          $imports = & $dumpbin /nologo /dependents "winbin/$product.4DX" |
+            Where-Object { $_ -match '^\s+(\S+\.dll)\s*$' } | ForEach-Object { $Matches[1].ToLowerInvariant() }
+          Write-Host "$product.4DX imports: $($imports -join ', ')"
+          foreach ($n in 'vcruntime140.dll', 'vcruntime140_1.dll', 'msvcp140.dll') {
+            if ($imports -contains $n) { Copy-Item (Join-Path $crt.FullName $n) winbin/ -Force }
+          }
+          Get-ChildItem winbin | Format-Table Name, Length
+
+      - name: verify DLL dependencies
+        shell: pwsh
+        run: ./.github/scripts/verify-windows-deps.ps1 -Dir winbin -Binary "${{ env.PRODUCT_NAME }}.4DX"
+
       - name: upload windows binaries
         uses: actions/upload-artifact@v4
         with:
           name: windows-binaries
-          path: ${{ env.BASE_DIR }}/Plugins/${{ env.PRODUCT_NAME }}.bundle/Contents/Windows64/${{ env.PRODUCT_NAME }}.4DX
+          path: winbin/
           if-no-files-found: error
 
   build-macos:
@@ -224,14 +280,14 @@ jobs:
           echo "winbuild contents:"
           ls -R winbuild || true
 
-          SRC=$(find winbuild -name "${PRODUCT}.4DX" -type f | head -1)
-          if [ -z "$SRC" ]; then
+          if [ ! -f "winbuild/${PRODUCT}.4DX" ]; then
             echo "::error::Windows binary ${PRODUCT}.4DX not found in winbuild/"
             exit 1
           fi
 
-          echo "Copying $SRC -> $BUNDLE/Contents/Windows64/${PRODUCT}.4DX"
-          cp "$SRC" "$BUNDLE/Contents/Windows64/${PRODUCT}.4DX"
+          # .4DX plus the runtime DLLs it needs (completeness was verified on
+          # the windows job).
+          cp winbuild/* "$BUNDLE/Contents/Windows64/"
 
           echo "BUNDLE_PATH=$BUNDLE" >> "$GITHUB_ENV"
           ls -R "$BUNDLE/Contents"
