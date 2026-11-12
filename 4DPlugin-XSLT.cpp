@@ -94,7 +94,7 @@ BOOL is_file_path(C_BLOB& h) {
         t.setUTF8String((const uint8_t *)h.getBytesPtr(), size);
         
         PA_Variable    params[1];
-        params[0] = PA_CreateVariable(eVK_Unistring);
+        params[0] = PA_CreateVariable(eVK_Undefined);
         PA_Unistring path = PA_CreateUnistring((PA_Unichar *)t.getUTF16StringPtr());
         PA_SetStringVariable(&params[0], &path);
         result = (1 == PA_GetLongintVariable(PA_ExecuteCommandByID(476 /* test path name */, params, 1)));
