@@ -1,0 +1,26 @@
+name: Ownership harness
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  asan-ubsan:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Fixed tree (all tests must pass)
+        run: tests/ownership/run.sh . "$RUNNER_TEMP/build-fixed"
+
+      - name: Baseline 2d376f6 (defect tests must fail, controls must pass)
+        run: |
+          mkdir -p "$RUNNER_TEMP/base"
+          git archive 2d376f62fb16cac5e1777d7c9539ae5fbc2db2ee | tar -x -C "$RUNNER_TEMP/base"
+          tests/ownership/run.sh --baseline "$RUNNER_TEMP/base" "$RUNNER_TEMP/build-base"
